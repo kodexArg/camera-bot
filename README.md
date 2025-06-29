@@ -5,41 +5,50 @@ FastAPI + OpenCV para visualizar en LAN/WAN la cámara de una Raspberry Pi con s
 ## Instalación
 
 ```bash
-uv venv       # crea entorno virtual
-uv sync       # instala dependencias según pyproject.toml / uv.lock
+python -m venv venv               # crea entorno virtual
+source venv/bin/activate          # activa entorno (Linux/Mac)
+# o en Windows: venv\Scripts\activate
+pip install -r requirements.txt  # instala dependencias
 ```
 
 ## Configuración
 
-Edita la sección `[tool.pi-camera]` en `pyproject.toml`:
+Edita el archivo `config.yaml`:
 
-```toml
-[tool.pi-camera]
-device_id = 0                 # ID del dispositivo de cámara (/dev/video0)
-fps = 15                      # Frames por segundo
-enable_ssl = false            # true para HTTPS, false para HTTP (por defecto)
-ssl_keyfile = ""              # Path a clave privada SSL (solo si enable_ssl = true)
-ssl_certfile = ""             # Path a certificado SSL (solo si enable_ssl = true)
+```yaml
+camera:
+  device_id: 0         # ID del dispositivo de cámara (/dev/video0)
+  fps: 15              # Frames por segundo
+
+server:
+  host: "0.0.0.0"      # Host del servidor
+  port: 8000           # Puerto del servidor
+
+ssl:
+  enable: false        # true para HTTPS, false para HTTP
+  keyfile: ""          # Path a clave privada SSL (solo si enable = true)
+  certfile: ""         # Path a certificado SSL (solo si enable = true)
 ```
 
 ## Ejecución
 
 ### HTTP (por defecto)
 ```bash
-uv run app
+python app/main.py
 ```
 
 ### HTTPS (requiere configuración)
 1. Configura certificados SSL (ver [INSTRUCCIONES.md](INSTRUCCIONES.md))
-2. Actualiza `pyproject.toml`:
-   ```toml
-   enable_ssl = true
-   ssl_keyfile = "/etc/letsencrypt/live/tu-dominio.com/privkey.pem"
-   ssl_certfile = "/etc/letsencrypt/live/tu-dominio.com/fullchain.pem"
+2. Actualiza `config.yaml`:
+   ```yaml
+   ssl:
+     enable: true
+     keyfile: "/etc/letsencrypt/live/tu-dominio.com/privkey.pem"
+     certfile: "/etc/letsencrypt/live/tu-dominio.com/fullchain.pem"
    ```
 3. Ejecuta con privilegios necesarios:
 ```bash
-sudo uv run app    # puerto 443 requiere sudo
+sudo python app/main.py    # puerto 443 requiere sudo
 ```
 
 ## Acceso

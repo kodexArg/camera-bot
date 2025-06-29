@@ -1,0 +1,13 @@
+# Pi Camera Stream Configuration
+camera:
+  device_id: 0         # ID del dispositivo de cámara (/dev/video0)
+  fps: 15              # Frames por segundo
+
+server:
+  host: "0.0.0.0"      # Host del servidor
+  port: 8000           # Puerto del servidor
+
+ssl:
+  enable: false        # true para HTTPS, false para HTTP
+  keyfile: ""          # Path a clave privada SSL (solo si enable = true)
+  certfile: ""         # Path a certificado SSL (solo si enable = true) 

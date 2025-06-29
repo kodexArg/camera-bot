@@ -16,7 +16,7 @@ app.include_router(router)
 
 # CLI entry point
 def cli() -> None:
-    """Punto de entrada del comando `uv run app`."""
+    """Punto de entrada del comando para ejecutar el servidor."""
     import uvicorn
     from config import settings
     

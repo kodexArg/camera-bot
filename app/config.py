@@ -1,11 +1,7 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import Optional
-
-try:
-    import tomllib  # Python 3.11+
-except ModuleNotFoundError:  # pragma: no cover
-    import tomli as tomllib  # type: ignore
+import yaml
 
 class _EnvSettings(BaseSettings):
     HOST: str = "0.0.0.0"
@@ -20,28 +16,46 @@ class _EnvSettings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
-def _load_pyproject_config():
-    pyproject = Path("pyproject.toml")
-    if not pyproject.exists():
+def _load_yaml_config():
+    config_file = Path("config.yaml")
+    if not config_file.exists():
         return {}
-    data = tomllib.loads(pyproject.read_text())
-    return data.get("tool", {}).get("pi-camera", {})
+    
+    with open(config_file, 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f)
+    
+    return data or {}
 
 _env = _EnvSettings()
-_toolcfg = _load_pyproject_config()
+_yaml_config = _load_yaml_config()
 
-if "device_id" in _toolcfg:
-    _env.DEVICE_ID = int(_toolcfg["device_id"])
-if "fps" in _toolcfg:
-    _env.STREAM_FPS = int(_toolcfg["fps"])
-if "enable_ssl" in _toolcfg:
-    _env.ENABLE_SSL = bool(_toolcfg["enable_ssl"])
+# Cargar configuración de cámara
+if 'camera' in _yaml_config:
+    camera_config = _yaml_config['camera']
+    if 'device_id' in camera_config:
+        _env.DEVICE_ID = int(camera_config['device_id'])
+    if 'fps' in camera_config:
+        _env.STREAM_FPS = int(camera_config['fps'])
 
-# Solo cargar certificados si SSL está habilitado
-if _env.ENABLE_SSL:
-    if "ssl_keyfile" in _toolcfg and _toolcfg["ssl_keyfile"]:
-        _env.SSL_KEYFILE = str(_toolcfg["ssl_keyfile"])
-    if "ssl_certfile" in _toolcfg and _toolcfg["ssl_certfile"]:
-        _env.SSL_CERTFILE = str(_toolcfg["ssl_certfile"])
+# Cargar configuración del servidor
+if 'server' in _yaml_config:
+    server_config = _yaml_config['server']
+    if 'host' in server_config:
+        _env.HOST = str(server_config['host'])
+    if 'port' in server_config:
+        _env.PORT = int(server_config['port'])
+
+# Cargar configuración SSL
+if 'ssl' in _yaml_config:
+    ssl_config = _yaml_config['ssl']
+    if 'enable' in ssl_config:
+        _env.ENABLE_SSL = bool(ssl_config['enable'])
+    
+    # Solo cargar certificados si SSL está habilitado
+    if _env.ENABLE_SSL:
+        if 'keyfile' in ssl_config and ssl_config['keyfile']:
+            _env.SSL_KEYFILE = str(ssl_config['keyfile'])
+        if 'certfile' in ssl_config and ssl_config['certfile']:
+            _env.SSL_CERTFILE = str(ssl_config['certfile'])
 
 settings = _env 

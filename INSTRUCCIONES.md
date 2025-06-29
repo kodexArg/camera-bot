@@ -42,24 +42,22 @@ sudo certbot certonly --webroot -w /var/www/html -d tu-dominio.com
 
 ## Configurar la Aplicación
 
-Edita `pyproject.toml` y habilita SSL:
+Edita `config.yaml` y habilita SSL:
 
-```toml
-[tool.pi-camera]
-device_id = 0
-fps = 15
-enable_ssl = true
-ssl_keyfile = "/etc/letsencrypt/live/tu-dominio.com/privkey.pem"
-ssl_certfile = "/etc/letsencrypt/live/tu-dominio.com/fullchain.pem"
+```yaml
+ssl:
+  enable: true
+  keyfile: "/etc/letsencrypt/live/tu-dominio.com/privkey.pem"
+  certfile: "/etc/letsencrypt/live/tu-dominio.com/fullchain.pem"
 ```
 
-**Nota**: `enable_ssl = false` por defecto. Debes cambiarlo a `true` para usar HTTPS.
+**Nota**: `enable: false` por defecto. Debes cambiarlo a `true` para usar HTTPS.
 
 ## Permisos
 
 ```bash
 # Opción 1: Ejecutar como root (simple pero menos seguro)
-sudo uv run app
+sudo python app/main.py
 
 # Opción 2: Agregar usuario al grupo ssl-cert (más seguro)
 sudo usermod -a -G ssl-cert $USER
