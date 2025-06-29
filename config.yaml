@@ -1,6 +1,11 @@
 # Pi Camera Stream Configuration
 camera:
+  # Para cámara local USB/CSI (usar device_id)
   device_id: 0         # ID del dispositivo de cámara (/dev/video0)
+  
+  # Para cámara IP RTSP (usar rtsp_url, tiene prioridad sobre device_id)
+  rtsp_url: "rtsp://admin:Ip1921681108@192.168.1.108:554/cam/realmonitor?channel=1&subtype=1"
+  
   fps: 15              # Frames por segundo
 
 server:

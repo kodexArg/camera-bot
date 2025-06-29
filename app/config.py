@@ -7,6 +7,7 @@ class _EnvSettings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     DEVICE_ID: int = 0
+    RTSP_URL: Optional[str] = None
     STREAM_FPS: int = 15
     ENABLE_SSL: bool = False
     SSL_KEYFILE: Optional[str] = None
@@ -34,6 +35,8 @@ if 'camera' in _yaml_config:
     camera_config = _yaml_config['camera']
     if 'device_id' in camera_config:
         _env.DEVICE_ID = int(camera_config['device_id'])
+    if 'rtsp_url' in camera_config and camera_config['rtsp_url']:
+        _env.RTSP_URL = str(camera_config['rtsp_url'])
     if 'fps' in camera_config:
         _env.STREAM_FPS = int(camera_config['fps'])
 

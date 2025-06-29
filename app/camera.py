@@ -7,12 +7,25 @@ from interfaces import CameraInterface
 
 
 class OpenCVCamera(CameraInterface):
-    """Implementación simple usando OpenCV para capturar fotogramas."""
+    """Implementación usando OpenCV para capturar fotogramas de cámara local o RTSP."""
 
     def __init__(self) -> None:
-        self.cap = cv2.VideoCapture(settings.DEVICE_ID)
+        # Priorizar RTSP si está configurado, sino usar device_id local
+        if settings.RTSP_URL:
+            self.source = settings.RTSP_URL
+            print(f"Using RTSP camera: {settings.RTSP_URL}")
+        else:
+            self.source = settings.DEVICE_ID
+            print(f"Using local camera device: {settings.DEVICE_ID}")
+        
+        self.cap = cv2.VideoCapture(self.source)
         if not self.cap.isOpened():
-            raise RuntimeError(f"Unable to open camera device {settings.DEVICE_ID}")
+            raise RuntimeError(f"Unable to open camera source: {self.source}")
+        
+        # Configuraciones adicionales para RTSP
+        if settings.RTSP_URL:
+            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Reduce buffer para menor latencia
+            
         self.interval = 1.0 / settings.STREAM_FPS
 
     def frames(self) -> Generator[bytes, None, None]:

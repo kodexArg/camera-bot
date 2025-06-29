@@ -2,6 +2,10 @@
 
 FastAPI + OpenCV para visualizar en LAN/WAN la cámara de una Raspberry Pi con soporte HTTPS.
 
+**Soporta:**
+- Cámaras locales USB/CSI (Raspberry Pi Camera)
+- Cámaras IP con protocolo RTSP
+
 ## Instalación
 
 ```bash
@@ -17,7 +21,12 @@ Edita el archivo `config.yaml`:
 
 ```yaml
 camera:
+  # Para cámara local USB/CSI (usar device_id)
   device_id: 0         # ID del dispositivo de cámara (/dev/video0)
+  
+  # Para cámara IP RTSP (usar rtsp_url, tiene prioridad sobre device_id)
+  rtsp_url: "rtsp://usuario:contraseña@192.168.1.100:554/stream"
+  
   fps: 15              # Frames por segundo
 
 server:
@@ -29,6 +38,8 @@ ssl:
   keyfile: ""          # Path a clave privada SSL (solo si enable = true)
   certfile: ""         # Path a certificado SSL (solo si enable = true)
 ```
+
+**Nota:** Si `rtsp_url` está configurado, tiene prioridad sobre `device_id`.
 
 ## Ejecución
 
